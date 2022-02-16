@@ -21,8 +21,8 @@ Ubuntu 18.04
 四、git操作
   1. ssh配置：
     初始配置：
-    git config --global user.name "yourname"
-    git config --global user.email“your@email.com"
+    git config --global user.name "NAME"
+    git config --global user.email ""
     确认：
     git config --list
     删除旧有文件（若有）：
@@ -42,8 +42,14 @@ Ubuntu 18.04
 
 五、IDE
   VS Code配置：
+  0. 下载：
+  官网链接，点击direct download link，后复制重定位URL
+  修改URL为国内镜像，vscode.cdn.azure.cn/..，下载提速
   1. 安装
+  .deb直接安装即可
   2. 配置
+  
+六、ROS
 
 
 
