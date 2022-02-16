@@ -1,0 +1,42 @@
+一、配置虚拟机
+VMWare Workstation
+配置VMWareTools：
+  共享文件夹：虚拟机/设置/共享文件夹
+
+二、安装虚拟机系统
+Ubuntu 18.04
+
+三、配置Linux
+1. 下载源：
+  Software & Updates下改为国内源
+2. 终端配置：
+  Linux Terminator
+3. 安装三方库：
+  3.0 查看已安装库：
+    dpkg -l
+    dpkg -l | grep -i LIB_NAME
+  3.1 SLAM所需三方库：
+    --Eigen：
+
+四、git操作
+  1. ssh配置：
+    初始配置：
+    git config --global user.name "yourname"
+    git config --global user.email“your@email.com"
+    确认：
+    git config --list
+    删除旧有文件（若有）：
+    ~/.ssh/下文件
+    创建密钥：
+    ssh-keygen -t rsa -C “GIT_EMAIL_ADDRESS”
+    复制密钥内容：
+    ~/.ssh/id_rsa.pub文件内容
+    添加至git中：
+    git/Setting/SSH Keys/Add SSH Keys
+    测试：
+    ssh -T git@git.com
+    输入yes
+    提示成功！
+  2. git clone
+  3. GitKraken
+    
