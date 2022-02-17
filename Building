@@ -16,7 +16,123 @@ Ubuntu 18.04
     dpkg -l
     dpkg -l | grep -i LIB_NAME
   3.1 SLAM所需三方库：
-    --Eigen：
+    --gflags：
+    sudo apt-get install libgflags-dev
+    
+    --eigen3：
+    sudo apt-get install libeigen3-dev
+    
+    --glog:
+    git clone http://github.com/google/glog
+    cd glog
+    git checkout v0.4.0
+    mkdir build && cd build
+    cmake -DBUILD_SHARED_LIBS=ON ..
+    make -j4 && sudo make install
+    
+    --Sophus:
+    git clone https://github.com/strasdat/Sophus.git
+    cd Sophus
+    git checkout v1.0.0
+    mkdir build && cd build
+    cmake ..
+    make -j4 && sudo make install
+    
+    --Ceres：
+    http://github.com/ceres-solver/ceres-solver/release
+    v1.14.0
+    mkdir build && cd build && cmake .. && make -j4
+    sudo make install
+    
+    --Opencv：
+    v4.2 in Ubuntu 18.04
+    1.下载依赖：
+    sudo apt-get install cmake libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
+    sudo apt-get install libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff5-dev libdc1394-22-dev  # 处理图像所需的包
+    sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libv4l-dev liblapacke-dev
+    sudo apt-get install libxvidcore-dev libx264-dev      # 处理视频所需的包
+    sudo apt-get install ffmpeg
+    # 可能需要安装的依赖
+    sudo add-apt-repository "deb http://security.ubuntu.com/ubuntu xenial-security main"
+    sudo apt update
+    sudo apt install libjasper1 libjasper-dev
+    2.下载源码：
+    https://opencv.org/releases/
+    contrib：https://github.com/opencv/opencv_contrib/releases
+    3.cmake：
+    cmake 过程中需要 ippicv，下载会很慢，所以先准备好， 下载地址：https://www.lanzous.com/i8qmxsh
+    下载后移至opencv代码目录
+    /home/username/opencv4.2/
+	          opencv-4.2.0/
+	          opencv_contrib-4.2.0/
+	          ippicv_2019_lnx_intel64_general_20180723.tgz
+    cd opencv-4.2.0 && mkdir build && cd build
+    cmake -D CMAKE_BUILD_TYPE=Release -D OPENCV_GENERATE_PKGCONFIG=YES -D CMAKE_INSTALL_PREFIX=/usr/local/opencv  -D WITH_GTK=ON -D WITH_OPENMP=ON ..
+    **编译选项含义：
+    cmake -D CMAKE_BUILD_TYPE=Release      # 选择发布
+      OPENCV_GENERATE_PKGCONFIG=YES     # 创建 PKGCONFIG文件
+      CMAKE_INSTALL_PREFIX=/usr/local/opencv #安装路径
+      WITH_GTK=ON          # ubuntu 上显示窗口必须加上这个
+    4.安装
+    make -j4 && sudo make install
+    5.环境配置
+    5.1 添加库路径
+    sudo sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf'
+    sudo ldconfig
+    5.2 pkgconfig
+    路径：/usr/local/lib/pkgconfig/opencv4.pc
+    **没有pkgconfig需创建，没有opencv4.pc需创建
+    # Package Information for pkg-config
+
+    prefix=/usr/local
+    exec_prefix=${prefix}
+    libdir=${exec_prefix}/lib
+    includedir_old=${prefix}/include/opencv4/opencv2
+    includedir_new=${prefix}/include/opencv4
+
+    Name: OpenCV
+    Description: Open Source Computer Vision Library
+    Version: 4.2.0
+    Libs: -L${exec_prefix}/lib -lopencv_gapi -lopencv_stitching -lopencv_aruco -lopencv_bgsegm -lopencv_bioinspired -lopencv_ccalib -lopencv_cudabgsegm -lopencv_cudafeatures2d -lopencv_cudaobjdetect -lopencv_cudastereo -lopencv_cvv -lopencv_dnn_objdetect -lopencv_dnn_superres -lopencv_dpm -lopencv_highgui -lopencv_face -lopencv_freetype -lopencv_fuzzy -lopencv_hdf -lopencv_hfs -lopencv_img_hash -lopencv_line_descriptor -lopencv_quality -lopencv_reg -lopencv_rgbd -lopencv_saliency -lopencv_sfm -lopencv_stereo -lopencv_structured_light -lopencv_phase_unwrapping -lopencv_superres -lopencv_cudacodec -lopencv_surface_matching -lopencv_tracking -lopencv_datasets -lopencv_text -lopencv_dnn -lopencv_plot -lopencv_videostab -lopencv_cudaoptflow -lopencv_optflow -lopencv_cudalegacy -lopencv_videoio -lopencv_cudawarping -lopencv_xfeatures2d -lopencv_shape -lopencv_ml -lopencv_ximgproc -lopencv_video -lopencv_xobjdetect -lopencv_objdetect -lopencv_calib3d -lopencv_imgcodecs -lopencv_features2d -lopencv_flann -lopencv_xphoto -lopencv_photo -lopencv_cudaimgproc -lopencv_cudafilters -lopencv_imgproc -lopencv_cudaarithm -lopencv_core -lopencv_cudev
+    Libs.private: -lm -lpthread -L/usr/lib/x86_64-linux-gnu -lGL -lGLU -lcudart_static -ldl -lrt -lnppc -lnppial -lnppicc -lnppicom -lnppidei -lnppif -lnppig -lnppim -lnppist -lnppisu -lnppitc -lnpps -lcublas -lcudnn -lcufft -L-L/usr/local/cuda -llib64 -L-L/usr/lib -lx86_64-linux-gnu
+    Cflags: -I${includedir_old} -I${includedir_new}
+    5.3 配置bash
+    sudo gedit /etc/bash.bashrc 
+    # 在末尾添加
+    PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig  
+    export PKG_CONFIG_PATH
+    # 保存更新
+    source /etc/bash.bashrc
+    sudo updatedb
+    # 测试配置成功
+    pkg-config --modversion opencv4
+    pkg-config --cflags opencv4
+    pkg-config --libs opencv4
+    6.测试
+    6.1 cd ../samples/cpp/exmaple_cmake
+    cmake. && make && ./opencv_example
+    6.2 编写cpp文件
+    #include "opencv.hpp"
+ 
+    using namespace cv;
+    using namespace std;
+ 
+    int main( int argc, char** argv )
+    {
+      cout << "OpenCV version : " << CV_VERSION << endl;
+      cout << "Major version : " << CV_MAJOR_VERSION << endl;
+      cout << "Minor version : " << CV_MINOR_VERSION << endl;
+      cout << "Subminor version : " << CV_SUBMINOR_VERSION << endl;
+    }
+    # 编译test.cpp程序，并生成可执行文件
+    g++ -std=c++11 test.cpp `pkg-config --libs --cflags opencv4` -o result
+    # 执行可执行文件
+    ./result
+    #输出：
+    OpenCV version : 4.2.0
+    Major version : 4
+    Minor version : 2
+    Subminor version : 0
 
 四、git操作
   1. ssh配置：
@@ -39,6 +155,7 @@ Ubuntu 18.04
     提示成功！
   2. git clone
   3. GitKraken
+    version: 6.5.1
 
 五、IDE
   VS Code配置：
@@ -50,6 +167,47 @@ Ubuntu 18.04
   2. 配置
   
 六、ROS
+  Ubuntu 18.04下安装ros melodic：
+  1.配置ros软件源
+  sudo sh -c '. /etc/lsb-release && echo "deb http://mirrors.ustc.edu.cn/ros/ubuntu/ `lsb_release -cs` main" > /etc/apt/sources.list.d/ros-latest.list'
+  2.添加keys
+  sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
+  **若密钥服务器hkp://ha.pool.sks-keyservers.com:80无法添加成功，则可以尝试hkp://pgp.mit.edu:80或者hkp://keyserver.ubuntu.net:80
+  3.保证系统的Debian安装包在最新状态
+  sudo apt update
+  4.ROS安装
+  4.1 桌面完整版 sudo apt install ros-melodic-desktop-full
+  4.2 桌面版 sudo apt install ros-melodic-desktop
+  4.3 基础版 sudo apt install ros-melodic-ros-base
+  4.4 单个软件包安装 sudo apt install ros-melodic-PACKAGE
+  5.ROS配置
+  5.1 初始化rosdep
+  1.sudo rosdep init && rosdep update
+  国外源，安装难度较大
+  2.使用rosdepc
+  sudo pip3 install rosdepc (sudo apt-get install python3-pip)
+  sudo rosdepc init && rosdepc update
+  国内源，安装很快
+  5.2 环境变量
+  echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
+  source ~/.bashrc
+  5.3 构建库依赖
+  sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential
+  5.4 rviz
+  sudo apt install rviz
+  6.测试
+  roscore 
+  **提示roscore未安装: /opt/ros/melodic/bin/查看有无roscore，无，则需安装ros-melodic-desktop；有，则重新设置环境变量
+  
+  卸载：
+  1.卸载全部ros:
+  sudo apt-get autoremove --purge ros-melodic 
+  2.逐步卸载ros：
+  //先卸载包
+  sudo apt-get purge ros-*
+  //后删除依赖，配置
+  sudo apt-get autoremove
+  
 
 
 
