@@ -208,6 +208,27 @@ Ubuntu 18.04
   //后删除依赖，配置
   sudo apt-get autoremove
   
+七、Docker
+  1. 下载
+  sudo apt update
+  sudo apt install -y docker.io
+  2. 修改docker配置
+  sudo gedit /etc/docker/daemon.json：
+  {
+  "registy-mirrors":["https://docker.mirrors.ustc.edu.cn"],
+  "insecure-registry":["DOCKER_HTTP"]
+  }
+  sudo usermod -aG docker $USER
+  sudo systemctl daemon-reload
+  sudo systemctl restart docker
+  关闭当前终端再打开
+  登录docker云：
+  docker login -u LOGIN_NAME DOCKER_HTTP
+  输入密码
+  出现Login Succeeded即成功
+  3.拉取镜像
+  docker pull DOCKER_NAME:VERSION_NUM
+  
 
 
 
